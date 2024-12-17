@@ -7,7 +7,7 @@ import (
 )
 
 func readInput() (ss [][]rune) {
-	f, err := os.Open("input")
+	f, err := os.Open("input.test1")
 	if err != nil {
 		log.Fatal(err)
 	}
