@@ -75,7 +75,7 @@ func shortestDoorCodePath(a, b rune) []rune {
 
 	var path []rune
 
-	if (aY == 3 && bX == 0) || (aX == 0 && bY == 3) {
+	if aY == 3 && bX == 0 {
 		// do y first
 		for diff := aY - bY; diff != 0; diff = aY - bY {
 			if diff > 0 {
@@ -85,6 +85,17 @@ func shortestDoorCodePath(a, b rune) []rune {
 				path = append(path, 'v')
 				aY++
 			}
+		}
+	} else if aX == 0 && aY != 3 && bY == 3 {
+		// do x first
+
+		for diff := aX - bX; diff > 0; diff = aX - bX {
+			path = append(path, '<')
+			aX--
+		}
+		for diff := aX - bX; diff < 0; diff = aX - bX {
+			path = append(path, '>')
+			aX++
 		}
 	}
 
@@ -122,6 +133,11 @@ func shortestRobotCodePath(a, b rune) []rune {
 		shortestCodePathMap[a] = make(map[rune][]rune)
 	}
 
+	if a == b {
+		shortestCodePathMap[a][b] = []rune{'A'}
+		return []rune{'A'}
+	}
+
 	aX := 0
 	aY := 0
 	bX := 0
@@ -153,7 +169,7 @@ func shortestRobotCodePath(a, b rune) []rune {
 				aY++
 			}
 		}
-	} else if aY == 1 && bY == 0 {
+	} else if aX == 0 {
 		// do x first
 		for diff := aX - bX; diff > 0; diff = aX - bX {
 			path = append(path, '<')
@@ -237,9 +253,16 @@ func sol1() {
 type codeSection struct {
 	val          []rune
 	nextSections []*codeSection
+	counts       map[int]int
 }
 
 func (cs *codeSection) count(depth int) int {
+	if cs.counts == nil {
+		cs.counts = make(map[int]int)
+	}
+	if cs.counts[depth] > 0 {
+		return cs.counts[depth]
+	}
 	if depth == 1 {
 		return len(cs.val)
 	}
@@ -247,6 +270,7 @@ func (cs *codeSection) count(depth int) int {
 	for _, ns := range cs.nextSections {
 		total += ns.count(depth - 1)
 	}
+	cs.counts[depth] = total
 	return total
 }
 
@@ -275,6 +299,124 @@ func sol2() {
 
 	running := 0
 
+	var cp []rune
+	var cs *codeSection
+	var allCS []*codeSection
+	cp = shortestRobotCodePath('A', '<')
+	// log.Println('A', '<', string(cp))
+	cs = getOrCreateCodeSection(cp)
+	allCS = append(allCS, cs)
+	cp = shortestRobotCodePath('A', 'v')
+	// log.Println('A', 'v', string(cp))
+	cs = getOrCreateCodeSection(cp)
+	allCS = append(allCS, cs)
+	cp = shortestRobotCodePath('A', '^')
+	// log.Println('A', '^', string(cp))
+	cs = getOrCreateCodeSection(cp)
+	allCS = append(allCS, cs)
+	cp = shortestRobotCodePath('A', '>')
+	// log.Println('A', '>', string(cp))
+	cs = getOrCreateCodeSection(cp)
+	allCS = append(allCS, cs)
+	cp = shortestRobotCodePath('A', 'A')
+	// log.Println('A', 'A', string(cp))
+	cs = getOrCreateCodeSection(cp)
+	allCS = append(allCS, cs)
+	cp = shortestRobotCodePath('^', '<')
+	// log.Println('^', '<', string(cp))
+	cs = getOrCreateCodeSection(cp)
+	allCS = append(allCS, cs)
+	cp = shortestRobotCodePath('^', 'v')
+	// log.Println('^', 'v', string(cp))
+	cs = getOrCreateCodeSection(cp)
+	allCS = append(allCS, cs)
+	cp = shortestRobotCodePath('^', 'A')
+	// log.Println('^', 'A', string(cp))
+	cs = getOrCreateCodeSection(cp)
+	allCS = append(allCS, cs)
+	cp = shortestRobotCodePath('^', '>')
+	// log.Println('^', '>', string(cp))
+	cs = getOrCreateCodeSection(cp)
+	allCS = append(allCS, cs)
+	cp = shortestRobotCodePath('^', '^')
+	// log.Println('^', '^', string(cp))
+	cs = getOrCreateCodeSection(cp)
+	allCS = append(allCS, cs)
+	cp = shortestRobotCodePath('v', '<')
+	// log.Println('v', '<', string(cp))
+	cs = getOrCreateCodeSection(cp)
+	allCS = append(allCS, cs)
+	cp = shortestRobotCodePath('v', 'v')
+	// log.Println('v', 'v', string(cp))
+	cs = getOrCreateCodeSection(cp)
+	allCS = append(allCS, cs)
+	cp = shortestRobotCodePath('v', 'A')
+	// log.Println('v', 'A', string(cp))
+	cs = getOrCreateCodeSection(cp)
+	allCS = append(allCS, cs)
+	cp = shortestRobotCodePath('v', '>')
+	// log.Println('v', '>', string(cp))
+	cs = getOrCreateCodeSection(cp)
+	allCS = append(allCS, cs)
+	cp = shortestRobotCodePath('v', '^')
+	// log.Println('v', '^', string(cp))
+	cs = getOrCreateCodeSection(cp)
+	allCS = append(allCS, cs)
+	cp = shortestRobotCodePath('>', '<')
+	// log.Println('>', '<', string(cp))
+	cs = getOrCreateCodeSection(cp)
+	allCS = append(allCS, cs)
+	cp = shortestRobotCodePath('>', 'v')
+	// log.Println('>', 'v', string(cp))
+	cs = getOrCreateCodeSection(cp)
+	allCS = append(allCS, cs)
+	cp = shortestRobotCodePath('>', '^')
+	// log.Println('>', '^', string(cp))
+	cs = getOrCreateCodeSection(cp)
+	allCS = append(allCS, cs)
+	cp = shortestRobotCodePath('>', 'A')
+	// log.Println('>', 'A', string(cp))
+	cs = getOrCreateCodeSection(cp)
+	allCS = append(allCS, cs)
+	cp = shortestRobotCodePath('>', '>')
+	// log.Println('>', '>', string(cp))
+	cs = getOrCreateCodeSection(cp)
+	allCS = append(allCS, cs)
+	cp = shortestRobotCodePath('<', 'A')
+	// log.Println('<', 'A', string(cp))
+	cs = getOrCreateCodeSection(cp)
+	allCS = append(allCS, cs)
+	cp = shortestRobotCodePath('<', 'v')
+	// log.Println('<', 'v', string(cp))
+	cs = getOrCreateCodeSection(cp)
+	allCS = append(allCS, cs)
+	cp = shortestRobotCodePath('<', '^')
+	// log.Println('<', '^', string(cp))
+	cs = getOrCreateCodeSection(cp)
+	allCS = append(allCS, cs)
+	cp = shortestRobotCodePath('<', '>')
+	// log.Println('<', '>', string(cp))
+	cs = getOrCreateCodeSection(cp)
+	allCS = append(allCS, cs)
+	cp = shortestRobotCodePath('<', '<')
+	// log.Println('<', '<', string(cp))
+	cs = getOrCreateCodeSection(cp)
+	allCS = append(allCS, cs)
+
+	for _, cs := range allCS {
+		lastCode := 'A'
+		for j, r := range cs.val {
+			var cs2 *codeSection
+			cp := shortestRobotCodePath(lastCode, r)
+			cs2 = getOrCreateCodeSection(cp)
+			if cs.nextSections == nil {
+				cs.nextSections = make([]*codeSection, len(cs.val))
+			}
+			cs.nextSections[j] = cs2
+			lastCode = r
+		}
+	}
+
 	for _, code := range codes {
 		lastCode := 'A'
 		var newCode []rune
@@ -283,106 +425,6 @@ func sol2() {
 			newCode = append(newCode, cp...)
 			lastCode = r
 		}
-
-		var cp []rune
-		var cs *codeSection
-		var allCS []*codeSection
-		cp = shortestRobotCodePath('A', '<')
-		log.Println('A', '<', string(cp))
-		cs = getOrCreateCodeSection(cp)
-		allCS = append(allCS, cs)
-		cp = shortestRobotCodePath('A', 'v')
-		log.Println('A', 'v', string(cp))
-		cs = getOrCreateCodeSection(cp)
-		allCS = append(allCS, cs)
-		cp = shortestRobotCodePath('A', '^')
-		log.Println('A', '^', string(cp))
-		cs = getOrCreateCodeSection(cp)
-		allCS = append(allCS, cs)
-		cp = shortestRobotCodePath('A', '>')
-		log.Println('A', '>', string(cp))
-		cs = getOrCreateCodeSection(cp)
-		allCS = append(allCS, cs)
-		cp = shortestRobotCodePath('A', 'A')
-		log.Println('A', 'A', string(cp))
-		cs = getOrCreateCodeSection(cp)
-		allCS = append(allCS, cs)
-		cp = shortestRobotCodePath('^', '<')
-		log.Println('^', '<', string(cp))
-		cs = getOrCreateCodeSection(cp)
-		allCS = append(allCS, cs)
-		cp = shortestRobotCodePath('^', 'v')
-		log.Println('^', 'v', string(cp))
-		cs = getOrCreateCodeSection(cp)
-		allCS = append(allCS, cs)
-		cp = shortestRobotCodePath('^', 'A')
-		log.Println('^', 'A', string(cp))
-		cs = getOrCreateCodeSection(cp)
-		allCS = append(allCS, cs)
-		cp = shortestRobotCodePath('^', '>')
-		log.Println('^', '>', string(cp))
-		cs = getOrCreateCodeSection(cp)
-		allCS = append(allCS, cs)
-		cp = shortestRobotCodePath('^', '^')
-		log.Println('^', '^', string(cp))
-		cs = getOrCreateCodeSection(cp)
-		allCS = append(allCS, cs)
-		cp = shortestRobotCodePath('>', '<')
-		log.Println('>', '<', string(cp))
-		cs = getOrCreateCodeSection(cp)
-		allCS = append(allCS, cs)
-		cp = shortestRobotCodePath('>', 'v')
-		log.Println('>', 'v', string(cp))
-		cs = getOrCreateCodeSection(cp)
-		allCS = append(allCS, cs)
-		cp = shortestRobotCodePath('>', '^')
-		log.Println('>', '^', string(cp))
-		cs = getOrCreateCodeSection(cp)
-		allCS = append(allCS, cs)
-		cp = shortestRobotCodePath('>', 'A')
-		log.Println('>', 'A', string(cp))
-		cs = getOrCreateCodeSection(cp)
-		allCS = append(allCS, cs)
-		cp = shortestRobotCodePath('>', '>')
-		log.Println('>', '>', string(cp))
-		cs = getOrCreateCodeSection(cp)
-		allCS = append(allCS, cs)
-		cp = shortestRobotCodePath('<', 'A')
-		log.Println('<', 'A', string(cp))
-		cs = getOrCreateCodeSection(cp)
-		allCS = append(allCS, cs)
-		cp = shortestRobotCodePath('<', 'v')
-		log.Println('<', 'v', string(cp))
-		cs = getOrCreateCodeSection(cp)
-		allCS = append(allCS, cs)
-		cp = shortestRobotCodePath('<', '^')
-		log.Println('<', '^', string(cp))
-		cs = getOrCreateCodeSection(cp)
-		allCS = append(allCS, cs)
-		cp = shortestRobotCodePath('<', '>')
-		log.Println('<', '>', string(cp))
-		cs = getOrCreateCodeSection(cp)
-		allCS = append(allCS, cs)
-		cp = shortestRobotCodePath('<', '<')
-		log.Println('<', '<', string(cp))
-		cs = getOrCreateCodeSection(cp)
-		allCS = append(allCS, cs)
-
-		for _, cs := range allCS {
-			lastCode := 'A'
-			for j, r := range cs.val {
-				var cs2 *codeSection
-				cp := shortestRobotCodePath(lastCode, r)
-				cs2 = getOrCreateCodeSection(cp)
-				if cs.nextSections == nil {
-					cs.nextSections = make([]*codeSection, len(cs.val))
-				}
-				cs.nextSections[j] = cs2
-				lastCode = r
-			}
-		}
-
-		log.Println(string(newCode))
 
 		lastCode = 'A'
 		var newCodeSections []*codeSection
@@ -393,18 +435,28 @@ func sol2() {
 			lastCode = r
 		}
 
+		// r := 0
+		// for j := 1; j <= 2; j++ {
+		// 	r = 0
+		// 	var str []rune
+		// 	for _, cs := range newCodeSections {
+		// 		r += cs.count(j)
+		// 		str = append(str, cs.getAsRunes(j)...)
+		// 	}
+		// 	log.Println(r, string(str))
+		// }
+
 		r := 0
 		for _, cs := range newCodeSections {
 			r += cs.count(25)
 		}
-		log.Println(r)
 
 		numCode := code[:len(code)-1]
 		val, err := strconv.Atoi(string(numCode))
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Println(val, r)
+		// log.Println(val, r)
 		running += val * r
 	}
 	log.Println(running)
