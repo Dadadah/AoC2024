@@ -134,18 +134,11 @@ func sol2() {
 	computerMap := buildGraph(conns)
 
 	var trees []*computerNode
-	count := 0
-	for _, comp := range computerMap {
-		count++
-		found := false
-		for _, tree := range trees {
-			if tree.tryFit(comp) {
-				found = true
-				break
-			}
-		}
-		if !found {
-			trees = append(trees, &computerNode{name: comp.name})
+	for _, base := range computerMap {
+		newTree := &computerNode{name: base.name}
+		trees = append(trees, newTree)
+		for _, comp := range computerMap {
+			newTree.tryFit(comp)
 		}
 	}
 
